@@ -14,6 +14,7 @@ pub fn main() {
 
 pub fn get_line() {
   let assert Ok(command) = erlang.get_line("")
+  command
 }
 
 pub fn print_command(command: String) {
