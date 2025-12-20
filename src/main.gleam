@@ -5,7 +5,7 @@ import gleam/string
 pub fn main() {
   io.print("$ ")
   let assert Ok(command) = erlang.get_line("")
-  let trim = print_command(command)
+  print_command(command)
   main()
 }
 
