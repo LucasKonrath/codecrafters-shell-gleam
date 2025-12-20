@@ -3,6 +3,7 @@ import gleam/io
 import gleam/string
 
 pub fn main() {
+  io.print("$ ")
   let assert Ok(command) = erlang.get_line("")
   print_command(command)
   main()
