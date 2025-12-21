@@ -21,6 +21,7 @@ pub fn print_command(command: String) {
   let trim = string.trim(command)
   case trim {
     "exit" -> halt(0)
+    "echo " <> text -> io.println(text)
     _ -> io.println(trim <> ": command not found")
   }
   trim
