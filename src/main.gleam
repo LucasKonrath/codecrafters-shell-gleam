@@ -22,7 +22,17 @@ pub fn print_command(command: String) {
   case trim {
     "exit" -> halt(0)
     "echo " <> text -> io.println(text)
+    "type" <> text -> io.println(get_type_of_command(text))
     _ -> io.println(trim <> ": command not found")
   }
   trim
+}
+
+pub fn get_type_of_command(command: String) -> String {
+  case command {
+    "echo" -> "echo is a shell builtin"
+    "type" -> "type is a shell builtin"
+    "exit" -> "exit is a shell builtin"
+    _ -> command <> ": command not found"
+  }
 }
