@@ -33,6 +33,6 @@ pub fn get_type_of_command(command: String) -> String {
     "echo" -> "echo is a shell builtin"
     "type" -> "type is a shell builtin"
     "exit" -> "exit is a shell builtin"
-    _ -> command <> ": command not found"
+    _ -> command <> ": not found"
   }
 }
