@@ -5,6 +5,9 @@ import gleam/string
 @external(erlang, "erlang", "halt")
 fn halt(exit_code: Int) -> Nil
 
+@external(erlang, "main_ffi", "find_executable")
+fn find_executable(command: String) -> Result(String, Nil)
+
 pub fn main() {
   io.print("$ ")
   let assert Ok(command) = erlang.get_line("")
@@ -33,6 +36,11 @@ pub fn get_type_of_command(command: String) -> String {
     "echo" -> "echo is a shell builtin"
     "type" -> "type is a shell builtin"
     "exit" -> "exit is a shell builtin"
-    _ -> command <> ": not found"
+    _ -> {
+      case find_executable(command) {
+        Ok(_) -> command <> " is " <> "/usr/bin/" <> command
+        Error(_) -> command <> ": not found"
+      }
+    }
   }
 }
