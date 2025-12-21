@@ -6,7 +6,7 @@ import gleam/string
 fn halt(exit_code: Int) -> Nil
 
 @external(erlang, "main_ffi", "find_executable")
-fn find_executable(command: String) -> Result(String, Nil)
+fn find_executable(name: String) -> Result(String, Nil)
 
 pub fn main() {
   io.print("$ ")
