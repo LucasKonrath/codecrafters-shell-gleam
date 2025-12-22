@@ -38,7 +38,7 @@ pub fn get_type_of_command(command: String) -> String {
     "exit" -> "exit is a shell builtin"
     _ -> {
       case find_executable(command) {
-        Ok(_) -> command <> " is " <> "/usr/bin/" <> command
+        Ok(path) -> command <> " is " <> path
         Error(_) -> command <> ": not found"
       }
     }
