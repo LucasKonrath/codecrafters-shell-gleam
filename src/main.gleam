@@ -1,4 +1,5 @@
 import gleam/erlang
+import gleam/erlang/charlist
 import gleam/io
 import gleam/string
 
@@ -7,6 +8,9 @@ fn halt(exit_code: Int) -> Nil
 
 @external(erlang, "main_ffi", "find_executable")
 fn find_executable(name: String) -> Result(String, Nil)
+
+@external(erlang, "os", "cmd")
+fn cmd(command_line: charlist.Charlist) -> String
 
 pub fn main() {
   io.print("$ ")
@@ -26,9 +30,36 @@ pub fn print_command(command: String) {
     "exit" -> halt(0)
     "echo " <> text -> io.println(text)
     "type " <> text -> io.println(get_type_of_command(text))
+    text -> {
+      let #(command, args) = separate_command(text)
+      execute(command, args)
+    }
     _ -> io.println(trim <> ": command not found")
   }
   trim
+}
+
+pub fn separate_command(command_line: String) -> #(String, List(String)) {
+  let parts = string.split(command_line, " ")
+  case parts {
+    [command, ..args] -> #(command, args)
+    [] -> #("", [])
+  }
+}
+
+pub fn execute(command, args) -> Nil {
+  case find_executable(command) {
+    Ok(_) -> {
+      let command_line = string.join([command, ..args], " ")
+      cmd(charlist.from_string(command_line))
+      |> io.print
+      Nil
+    }
+    Error(_) -> {
+      io.println(command <> ": command not found")
+      Nil
+    }
+  }
 }
 
 pub fn get_type_of_command(command: String) -> String {
