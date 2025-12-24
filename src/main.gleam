@@ -34,7 +34,6 @@ pub fn print_command(command: String) {
       let #(command, args) = separate_command(text)
       execute(command, args)
     }
-    _ -> io.println(trim <> ": command not found")
   }
   trim
 }
