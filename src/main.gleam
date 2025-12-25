@@ -12,6 +12,9 @@ fn find_executable(name: String) -> Result(String, Nil)
 @external(erlang, "os", "cmd")
 fn cmd(command_line: charlist.Charlist) -> String
 
+@external(erlang, "file", "get_cwd")
+fn get_cwd() -> Result(charlist.Charlist, Nil)
+
 pub fn main() {
   io.print("$ ")
   let assert Ok(command) = erlang.get_line("")
@@ -30,6 +33,12 @@ pub fn print_command(command: String) {
     "exit" -> halt(0)
     "echo " <> text -> io.println(text)
     "type " <> text -> io.println(get_type_of_command(text))
+    "pwd" -> {
+      case get_cwd() {
+        Ok(cwd) -> io.println(charlist.to_string(cwd))
+        Error(_) -> io.println("Error getting current directory")
+      }
+    }
     text -> {
       let #(command, args) = separate_command(text)
       execute(command, args)
@@ -66,6 +75,7 @@ pub fn get_type_of_command(command: String) -> String {
     "echo" -> "echo is a shell builtin"
     "type" -> "type is a shell builtin"
     "exit" -> "exit is a shell builtin"
+    "pwd" -> "pwd is a shell builtin"
     _ -> {
       case find_executable(command) {
         Ok(path) -> command <> " is " <> path
