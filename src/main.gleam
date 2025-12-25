@@ -15,6 +15,9 @@ fn cmd(command_line: charlist.Charlist) -> String
 @external(erlang, "file", "get_cwd")
 fn get_cwd() -> Result(charlist.Charlist, Nil)
 
+@external(erlang, "file", "set_cwd")
+fn set_cwd(path: String) -> a
+
 pub fn main() {
   io.print("$ ")
   let assert Ok(command) = erlang.get_line("")
@@ -37,6 +40,12 @@ pub fn print_command(command: String) {
       case get_cwd() {
         Ok(cwd) -> io.println(charlist.to_string(cwd))
         Error(_) -> io.println("Error getting current directory")
+      }
+    }
+    "cd " <> path -> {
+      case set_cwd(path) {
+        Ok(_) -> Nil
+        Error(_) -> io.println("cd: " <> path <> ": No such file or directory")
       }
     }
     text -> {
