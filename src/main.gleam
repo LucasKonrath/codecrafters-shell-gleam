@@ -1,3 +1,4 @@
+import gleam/dynamic
 import gleam/erlang
 import gleam/erlang/charlist
 import gleam/io
@@ -16,7 +17,7 @@ fn cmd(command_line: charlist.Charlist) -> String
 fn get_cwd() -> Result(charlist.Charlist, Nil)
 
 @external(erlang, "file", "set_cwd")
-fn set_cwd(path: String) -> a
+fn set_cwd(path: String) -> dynamic.Dynamic
 
 pub fn main() {
   io.print("$ ")
@@ -43,9 +44,10 @@ pub fn print_command(command: String) {
       }
     }
     "cd " <> path -> {
-      case set_cwd(path) {
-        Ok(_) -> Nil
-        Error(_) -> io.println("cd: " <> path <> ": No such file or directory")
+      let result = set_cwd(path)
+      case dynamic.classify(result) {
+        "Atom" -> Nil
+        _ -> io.println("cd: " <> path <> ": No such file or directory")
       }
     }
     text -> {
@@ -85,6 +87,7 @@ pub fn get_type_of_command(command: String) -> String {
     "type" -> "type is a shell builtin"
     "exit" -> "exit is a shell builtin"
     "pwd" -> "pwd is a shell builtin"
+    "cd" -> "cd is a shell builtin"
     _ -> {
       case find_executable(command) {
         Ok(path) -> command <> " is " <> path
