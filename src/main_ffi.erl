@@ -1,5 +1,5 @@
 -module(main_ffi).
--export([get_line/1, find_executable/1]).
+-export([get_line/1, find_executable/1, get_home/0]).
 
 -spec get_line(io:prompt()) -> {ok, unicode:unicode_binary()} | {error, nil}.
 get_line(PromptBin) ->
@@ -16,4 +16,14 @@ find_executable(NameBin) ->
     case os:find_executable(Name) of
         false -> {error, nil};
         Filename -> {ok, unicode:characters_to_binary(Filename)}
+    end.
+
+get_home() ->
+    case os:getenv("HOME") of
+        false ->
+            none;
+        Charlist when is_list(Charlist) ->
+            {some, unicode:characters_to_binary(Charlist)};
+        String when is_binary(String) ->
+            {some, String}
     end.
