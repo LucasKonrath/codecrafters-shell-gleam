@@ -2,6 +2,7 @@ import gleam/dynamic
 import gleam/erlang
 import gleam/erlang/charlist
 import gleam/io
+import gleam/option.{type Option, None, Some}
 import gleam/string
 
 @external(erlang, "erlang", "halt")
@@ -18,6 +19,9 @@ fn get_cwd() -> Result(charlist.Charlist, Nil)
 
 @external(erlang, "file", "set_cwd")
 fn set_cwd(path: String) -> dynamic.Dynamic
+
+@external(erlang, "exec", "get_home")
+pub fn get_home() -> Option(String)
 
 pub fn main() {
   io.print("$ ")
@@ -44,6 +48,24 @@ pub fn print_command(command: String) {
       }
     }
     "cd " <> path -> {
+      case path {
+        "~" -> {
+          case home() {
+            Ok(home_path) -> {
+              let result = set_cwd(home_path)
+              case dynamic.classify(result) {
+                "Atom" -> Nil
+                _ ->
+                  io.println(
+                    "cd: " <> home_path <> ": No such file or directory",
+                  )
+              }
+            }
+            Error(message) -> io.println("cd: " <> message)
+          }
+        }
+        _ -> Nil
+      }
       let result = set_cwd(path)
       case dynamic.classify(result) {
         "Atom" -> Nil
@@ -94,5 +116,12 @@ pub fn get_type_of_command(command: String) -> String {
         Error(_) -> command <> ": not found"
       }
     }
+  }
+}
+
+fn home() {
+  case get_home() {
+    Some(string) -> Ok(string)
+    None -> Error("Couldn't get home directory")
   }
 }
